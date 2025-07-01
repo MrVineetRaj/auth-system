@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
-import { AVAILABLE_ROLES, USER_ROLES } from '../../lib/constants.js';
+import bcrypt from 'bcryptjs';
+import { AVAILABLE_ROLES, USER_ROLES } from '../../lib/constants';
 
 export interface IUser {
   _id?: string;
@@ -48,19 +49,15 @@ const userSchema = new mongoose.Schema(
     },
     emailVerificationToken: {
       type: String,
-      default: null,
     },
     emailVerificationTokenExpires: {
       type: Date,
-      default: null,
     },
     passwordResetToken: {
       type: String,
-      default: null,
     },
     passwordResetTokenExpires: {
       type: Date,
-      default: null,
     },
   },
   {
@@ -68,8 +65,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ name: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ emailVerificationToken: 1 });
 userSchema.index({ passwordResetToken: 1 });
@@ -81,7 +76,8 @@ userSchema.pre('save', function (next) {
   }
 
   if (this.isModified('password')) {
-    // encrypt password
+    // Hash the password before saving
+    this.password = bcrypt.hashSync(this.password, 10);
   }
 
   next();

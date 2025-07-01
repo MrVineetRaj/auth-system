@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import useragent from 'express-useragent';
 import { ApiResponse } from './lib/api.helper';
 import { register as authRoutes } from './routes/auth';
 const app = express();
@@ -10,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors());
+app.use(useragent.express());
 
 // routes
 app.get('/api/v1/health-check', (req, res) => {
